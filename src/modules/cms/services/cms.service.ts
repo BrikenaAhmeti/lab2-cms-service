@@ -119,6 +119,32 @@ export class CmsService {
         return this.cmsRepository.deletePage(id);
     }
 
+    async listSections(pageId: string): Promise<CmsSectionEntity[]> {
+        await this.getPageById(pageId);
+        return this.cmsRepository.listSectionsByPageId(pageId);
+    }
+
+    async getSectionById(
+        id: string,
+        pageId?: string,
+    ): Promise<CmsSectionEntity> {
+        if (pageId) {
+            await this.getPageById(pageId);
+        }
+
+        const section = await this.cmsRepository.findSectionById(id);
+
+        if (!section) {
+            throw new AppError('CMS section not found', 404);
+        }
+
+        if (pageId && section.pageId !== pageId) {
+            throw new AppError('CMS section does not belong to this page', 404);
+        }
+
+        return section;
+    }
+
     async createSection(
         pageId: string,
         data: Omit<CreateCmsSectionData, 'pageId' | 'sortOrder'> & {
@@ -144,12 +170,9 @@ export class CmsService {
     async updateSection(
         id: string,
         data: UpdateCmsSectionData,
+        pageId?: string,
     ): Promise<CmsSectionEntity> {
-        const section = await this.cmsRepository.findSectionById(id);
-
-        if (!section) {
-            throw new AppError('CMS section not found', 404);
-        }
+        await this.getSectionById(id, pageId);
 
         return this.cmsRepository.updateSection(id, {
             ...data,
@@ -170,16 +193,34 @@ export class CmsService {
             throw new AppError('At least one section is required for reorder', 400);
         }
 
+        const sectionIds = sections.map((section) => section.id);
+        const sortOrders = sections.map((section) => section.sortOrder);
+
+        if (new Set(sectionIds).size !== sectionIds.length) {
+            throw new AppError('Section IDs must be unique for reorder', 400);
+        }
+
+        if (new Set(sortOrders).size !== sortOrders.length) {
+            throw new AppError('Section sort orders must be unique for reorder', 400);
+        }
+
+        const existingSections = await this.cmsRepository.listSectionsByPageId(pageId);
+        const existingSectionIds = new Set(
+            existingSections.map((section) => section.id),
+        );
+        const containsForeignSection = sectionIds.some(
+            (sectionId) => !existingSectionIds.has(sectionId),
+        );
+
+        if (containsForeignSection) {
+            throw new AppError('All reordered sections must belong to the page', 400);
+        }
+
         return this.cmsRepository.reorderSections(pageId, sections);
     }
 
-    async deleteSection(id: string): Promise<CmsSectionEntity> {
-        const section = await this.cmsRepository.findSectionById(id);
-
-        if (!section) {
-            throw new AppError('CMS section not found', 404);
-        }
-
+    async deleteSection(id: string, pageId?: string): Promise<CmsSectionEntity> {
+        await this.getSectionById(id, pageId);
         return this.cmsRepository.deleteSection(id);
     }
 
@@ -189,6 +230,16 @@ export class CmsService {
 
     listPublicBanners(now = new Date()): Promise<CmsBannerEntity[]> {
         return this.cmsRepository.listActiveBanners(now);
+    }
+
+    async getBannerById(id: string): Promise<CmsBannerEntity> {
+        const banner = await this.cmsRepository.findBannerById(id);
+
+        if (!banner) {
+            throw new AppError('CMS banner not found', 404);
+        }
+
+        return banner;
     }
 
     async createBanner(data: CreateCmsBannerData): Promise<CmsBannerEntity> {
@@ -207,11 +258,7 @@ export class CmsService {
         id: string,
         data: UpdateCmsBannerData,
     ): Promise<CmsBannerEntity> {
-        const banner = await this.cmsRepository.findBannerById(id);
-
-        if (!banner) {
-            throw new AppError('CMS banner not found', 404);
-        }
+        const banner = await this.getBannerById(id);
 
         this.validateBannerSchedule(
             data.startDate === undefined ? banner.startDate : data.startDate,
@@ -228,12 +275,7 @@ export class CmsService {
     }
 
     async deleteBanner(id: string): Promise<CmsBannerEntity> {
-        const banner = await this.cmsRepository.findBannerById(id);
-
-        if (!banner) {
-            throw new AppError('CMS banner not found', 404);
-        }
-
+        await this.getBannerById(id);
         return this.cmsRepository.deleteBanner(id);
     }
 

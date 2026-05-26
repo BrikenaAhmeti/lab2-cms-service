@@ -86,6 +86,7 @@ export interface CmsRepository {
     updatePage(id: string, data: UpdateCmsPageData): Promise<CmsPageEntity>;
     deletePage(id: string): Promise<CmsPageEntity>;
 
+    listSectionsByPageId(pageId: string): Promise<CmsSectionEntity[]>;
     createSection(data: CreateCmsSectionData): Promise<CmsSectionEntity>;
     findSectionById(id: string): Promise<CmsSectionEntity | null>;
     getNextSectionSortOrder(pageId: string): Promise<number>;

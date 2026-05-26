@@ -19,10 +19,13 @@ import {
     UpdateCmsSectionCommand,
 } from '../commands/cms.commands';
 import {
+    GetCmsBannerByIdQuery,
     GetCmsPageByIdQuery,
+    GetCmsSectionByIdQuery,
     GetPublicCmsPageBySlugQuery,
     ListCmsBannersQuery,
     ListCmsPagesQuery,
+    ListCmsSectionsQuery,
     ListPublicCmsBannersQuery,
 } from '../queries/cms.queries';
 
@@ -89,12 +92,34 @@ export class CreateCmsSectionHandler
     }
 }
 
+export class ListCmsSectionsHandler
+    implements QueryHandler<ListCmsSectionsQuery, CmsSectionEntity[]> {
+    constructor(private readonly cmsService: CmsService) { }
+
+    execute(query: ListCmsSectionsQuery): Promise<CmsSectionEntity[]> {
+        return this.cmsService.listSections(query.pageId);
+    }
+}
+
+export class GetCmsSectionByIdHandler
+    implements QueryHandler<GetCmsSectionByIdQuery, CmsSectionEntity> {
+    constructor(private readonly cmsService: CmsService) { }
+
+    execute(query: GetCmsSectionByIdQuery): Promise<CmsSectionEntity> {
+        return this.cmsService.getSectionById(query.id, query.pageId);
+    }
+}
+
 export class UpdateCmsSectionHandler
     implements CommandHandler<UpdateCmsSectionCommand, CmsSectionEntity> {
     constructor(private readonly cmsService: CmsService) { }
 
     execute(command: UpdateCmsSectionCommand): Promise<CmsSectionEntity> {
-        return this.cmsService.updateSection(command.id, command.data);
+        return this.cmsService.updateSection(
+            command.id,
+            command.data,
+            command.pageId,
+        );
     }
 }
 
@@ -112,7 +137,7 @@ export class DeleteCmsSectionHandler
     constructor(private readonly cmsService: CmsService) { }
 
     execute(command: DeleteCmsSectionCommand): Promise<CmsSectionEntity> {
-        return this.cmsService.deleteSection(command.id);
+        return this.cmsService.deleteSection(command.id, command.pageId);
     }
 }
 
@@ -131,6 +156,15 @@ export class ListPublicCmsBannersHandler
 
     execute(): Promise<CmsBannerEntity[]> {
         return this.cmsService.listPublicBanners();
+    }
+}
+
+export class GetCmsBannerByIdHandler
+    implements QueryHandler<GetCmsBannerByIdQuery, CmsBannerEntity> {
+    constructor(private readonly cmsService: CmsService) { }
+
+    execute(query: GetCmsBannerByIdQuery): Promise<CmsBannerEntity> {
+        return this.cmsService.getBannerById(query.id);
     }
 }
 

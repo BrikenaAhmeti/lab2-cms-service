@@ -55,6 +55,7 @@ export class UpdateCmsSectionCommand implements Command {
     constructor(
         public readonly id: string,
         public readonly data: UpdateCmsSectionData,
+        public readonly pageId?: string,
     ) { }
 }
 
@@ -66,7 +67,10 @@ export class ReorderCmsSectionsCommand implements Command {
 }
 
 export class DeleteCmsSectionCommand implements Command {
-    constructor(public readonly id: string) { }
+    constructor(
+        public readonly id: string,
+        public readonly pageId?: string,
+    ) { }
 }
 
 export class CreateCmsBannerCommand implements Command {

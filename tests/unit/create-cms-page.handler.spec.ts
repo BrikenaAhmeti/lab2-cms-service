@@ -13,6 +13,7 @@ function createRepositoryMock(): jest.Mocked<CmsRepository> {
         findPublishedPageBySlug: jest.fn(),
         updatePage: jest.fn(),
         deletePage: jest.fn(),
+        listSectionsByPageId: jest.fn(),
         createSection: jest.fn(),
         findSectionById: jest.fn(),
         getNextSectionSortOrder: jest.fn(),

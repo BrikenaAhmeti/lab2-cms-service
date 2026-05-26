@@ -37,7 +37,14 @@ const defaultPages = [
         metaTitle: 'Departments',
         metaDescription: 'Browse available medical departments.',
         isPublished: true,
-        sections: [],
+        sections: [
+            {
+                type: 'TEXT' as const,
+                title: 'Departments',
+                body: 'Placeholder CMS content for department highlights.',
+                sortOrder: 0,
+            },
+        ],
     },
     {
         slug: 'doctors',
@@ -45,7 +52,14 @@ const defaultPages = [
         metaTitle: 'Doctors',
         metaDescription: 'Browse public doctor profiles.',
         isPublished: true,
-        sections: [],
+        sections: [
+            {
+                type: 'TEXT' as const,
+                title: 'Doctors',
+                body: 'Placeholder CMS content for public doctor profiles.',
+                sortOrder: 0,
+            },
+        ],
     },
     {
         slug: 'services',
@@ -53,7 +67,14 @@ const defaultPages = [
         metaTitle: 'Services',
         metaDescription: 'Browse medical services.',
         isPublished: true,
-        sections: [],
+        sections: [
+            {
+                type: 'TEXT' as const,
+                title: 'Services',
+                body: 'Placeholder CMS content for available services.',
+                sortOrder: 0,
+            },
+        ],
     },
     {
         slug: 'contact',
@@ -61,13 +82,20 @@ const defaultPages = [
         metaTitle: 'Contact',
         metaDescription: 'Contact the facility.',
         isPublished: true,
-        sections: [],
+        sections: [
+            {
+                type: 'CTA' as const,
+                title: 'Contact MedSphere',
+                body: 'Placeholder CMS content for public contact details.',
+                sortOrder: 0,
+            },
+        ],
     },
 ];
 
 async function main() {
     for (const page of defaultPages) {
-        await prisma.cmsPage.upsert({
+        const seededPage = await prisma.cmsPage.upsert({
             where: { slug: page.slug },
             update: {
                 title: page.title,
@@ -88,7 +116,20 @@ async function main() {
                     })),
                 },
             },
+            include: {
+                sections: true,
+            },
         });
+
+        if (seededPage.sections.length === 0 && page.sections.length > 0) {
+            await prisma.cmsSection.createMany({
+                data: page.sections.map((section) => ({
+                    ...section,
+                    pageId: seededPage.id,
+                    isVisible: true,
+                })),
+            });
+        }
     }
 }
 

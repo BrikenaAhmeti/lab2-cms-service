@@ -49,11 +49,15 @@ Admin CMS endpoints live under `/api/cms`.
 | `GET` | `/api/cms/pages/:id` | Get page by ID |
 | `PUT` | `/api/cms/pages/:id` | Update page |
 | `DELETE` | `/api/cms/pages/:id` | Delete page |
+| `GET` | `/api/cms/pages/:pageId/sections` | List sections for a page |
 | `POST` | `/api/cms/pages/:pageId/sections` | Create section |
 | `PATCH` | `/api/cms/pages/:pageId/sections/reorder` | Reorder sections |
+| `GET` | `/api/cms/pages/:pageId/sections/:id` | Get section by ID |
+| `PATCH` | `/api/cms/pages/:pageId/sections/:id/visibility` | Toggle section visibility |
 | `PUT` | `/api/cms/pages/:pageId/sections/:id` | Update section |
 | `DELETE` | `/api/cms/pages/:pageId/sections/:id` | Delete section |
 | `GET` | `/api/cms/banners` | List banners |
+| `GET` | `/api/cms/banners/:id` | Get banner by ID |
 | `POST` | `/api/cms/banners` | Create banner |
 | `PUT` | `/api/cms/banners/:id` | Update banner |
 | `DELETE` | `/api/cms/banners/:id` | Delete banner |
@@ -86,7 +90,7 @@ npm run dev
 Default URL:
 
 ```text
-http://localhost:3005
+http://localhost:3009
 ```
 
 Health check:
@@ -98,7 +102,7 @@ GET /health
 ## Environment
 
 ```env
-PORT=3005
+PORT=3009
 NODE_ENV=development
 CORS_ORIGIN=http://localhost:5173
 DATABASE_URL="postgresql://postgres:postgres@localhost:5432/medsphere_cms?schema=public"

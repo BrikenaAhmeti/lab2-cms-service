@@ -19,17 +19,31 @@ cmsRoutes.delete('/pages/:id', requireCmsEditor, (req, res) =>
     controller.deletePage(req, res),
 );
 
+cmsRoutes.get('/pages/:pageId/sections', (req, res) =>
+    controller.listSections(req, res),
+);
 cmsRoutes.post('/pages/:pageId/sections', requireCmsEditor, (req, res) =>
     controller.createSection(req, res),
 );
 cmsRoutes.patch('/pages/:pageId/sections/reorder', requireCmsEditor, (req, res) =>
     controller.reorderSections(req, res),
 );
+cmsRoutes.get('/pages/:pageId/sections/:id', (req, res) =>
+    controller.getSectionById(req, res),
+);
+cmsRoutes.patch(
+    '/pages/:pageId/sections/:id/visibility',
+    requireCmsEditor,
+    (req, res) => controller.toggleSectionVisibility(req, res),
+);
 cmsRoutes.put('/pages/:pageId/sections/:id', requireCmsEditor, (req, res) =>
     controller.updateSection(req, res),
 );
 cmsRoutes.delete('/pages/:pageId/sections/:id', requireCmsEditor, (req, res) =>
     controller.deleteSection(req, res),
+);
+cmsRoutes.get('/sections/:id', (req, res) =>
+    controller.getSectionById(req, res),
 );
 cmsRoutes.put('/sections/:id', requireCmsEditor, (req, res) =>
     controller.updateSection(req, res),
@@ -39,6 +53,7 @@ cmsRoutes.delete('/sections/:id', requireCmsEditor, (req, res) =>
 );
 
 cmsRoutes.get('/banners', (req, res) => controller.listBanners(req, res));
+cmsRoutes.get('/banners/:id', (req, res) => controller.getBannerById(req, res));
 cmsRoutes.post('/banners', requireCmsEditor, (req, res) =>
     controller.createBanner(req, res),
 );

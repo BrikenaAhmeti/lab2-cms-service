@@ -25,10 +25,13 @@ import {
     DeleteCmsBannerHandler,
     DeleteCmsPageHandler,
     DeleteCmsSectionHandler,
+    GetCmsBannerByIdHandler,
     GetCmsPageByIdHandler,
+    GetCmsSectionByIdHandler,
     GetPublicCmsPageBySlugHandler,
     ListCmsBannersHandler,
     ListCmsPagesHandler,
+    ListCmsSectionsHandler,
     ListPublicCmsBannersHandler,
     ReorderCmsSectionsHandler,
     UpdateCmsBannerHandler,
@@ -36,10 +39,13 @@ import {
     UpdateCmsSectionHandler,
 } from '../application/handlers/cms.handlers';
 import {
+    GetCmsBannerByIdQuery,
     GetCmsPageByIdQuery,
+    GetCmsSectionByIdQuery,
     GetPublicCmsPageBySlugQuery,
     ListCmsBannersQuery,
     ListCmsPagesQuery,
+    ListCmsSectionsQuery,
     ListPublicCmsBannersQuery,
 } from '../application/queries/cms.queries';
 
@@ -65,6 +71,10 @@ const createSectionSchema = z.object({
 });
 
 const updateSectionSchema = createSectionSchema.partial();
+
+const toggleSectionVisibilitySchema = z.object({
+    isVisible: z.boolean(),
+});
 
 const reorderSectionsSchema = z.object({
     sections: z.array(
@@ -95,6 +105,11 @@ function actorId(req: Request) {
 function routeParam(req: Request, name: string) {
     const value = req.params[name];
     return (Array.isArray(value) ? value[0] : value) ?? '';
+}
+
+function optionalRouteParam(req: Request, name: string) {
+    const value = routeParam(req, name);
+    return value === '' ? undefined : value;
 }
 
 export class CmsController {
@@ -158,6 +173,27 @@ export class CmsController {
         return res.status(204).send();
     }
 
+    async listSections(req: Request, res: Response) {
+        const handler = new ListCmsSectionsHandler(this.service);
+        const query = new ListCmsSectionsQuery(routeParam(req, 'pageId'));
+
+        const result = await this.queryBus.execute(handler, query);
+
+        return res.status(200).json(result);
+    }
+
+    async getSectionById(req: Request, res: Response) {
+        const handler = new GetCmsSectionByIdHandler(this.service);
+        const query = new GetCmsSectionByIdQuery(
+            routeParam(req, 'id'),
+            optionalRouteParam(req, 'pageId'),
+        );
+
+        const result = await this.queryBus.execute(handler, query);
+
+        return res.status(200).json(result);
+    }
+
     async createSection(req: Request, res: Response) {
         const body = createSectionSchema.parse(req.body);
         const handler = new CreateCmsSectionHandler(this.service);
@@ -175,10 +211,32 @@ export class CmsController {
     async updateSection(req: Request, res: Response) {
         const body = updateSectionSchema.parse(req.body);
         const handler = new UpdateCmsSectionHandler(this.service);
-        const command = new UpdateCmsSectionCommand(routeParam(req, 'id'), {
-            ...body,
-            updatedBy: actorId(req),
-        });
+        const command = new UpdateCmsSectionCommand(
+            routeParam(req, 'id'),
+            {
+                ...body,
+                updatedBy: actorId(req),
+            },
+            optionalRouteParam(req, 'pageId'),
+        );
+
+        const result = await this.commandBus.execute(handler, command);
+        await this.publishPageUpdate(result.pageId);
+
+        return res.status(200).json(result);
+    }
+
+    async toggleSectionVisibility(req: Request, res: Response) {
+        const body = toggleSectionVisibilitySchema.parse(req.body);
+        const handler = new UpdateCmsSectionHandler(this.service);
+        const command = new UpdateCmsSectionCommand(
+            routeParam(req, 'id'),
+            {
+                isVisible: body.isVisible,
+                updatedBy: actorId(req),
+            },
+            routeParam(req, 'pageId'),
+        );
 
         const result = await this.commandBus.execute(handler, command);
         await this.publishPageUpdate(result.pageId);
@@ -203,7 +261,10 @@ export class CmsController {
 
     async deleteSection(req: Request, res: Response) {
         const handler = new DeleteCmsSectionHandler(this.service);
-        const command = new DeleteCmsSectionCommand(routeParam(req, 'id'));
+        const command = new DeleteCmsSectionCommand(
+            routeParam(req, 'id'),
+            optionalRouteParam(req, 'pageId'),
+        );
 
         const result = await this.commandBus.execute(handler, command);
         await this.publishPageUpdate(result.pageId);
@@ -214,6 +275,15 @@ export class CmsController {
     async listBanners(_req: Request, res: Response) {
         const handler = new ListCmsBannersHandler(this.service);
         const result = await this.queryBus.execute(handler, new ListCmsBannersQuery());
+
+        return res.status(200).json(result);
+    }
+
+    async getBannerById(req: Request, res: Response) {
+        const handler = new GetCmsBannerByIdHandler(this.service);
+        const query = new GetCmsBannerByIdQuery(routeParam(req, 'id'));
+
+        const result = await this.queryBus.execute(handler, query);
 
         return res.status(200).json(result);
     }

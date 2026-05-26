@@ -102,6 +102,13 @@ export class CmsPrismaRepository implements CmsRepository {
         });
     }
 
+    async listSectionsByPageId(pageId: string) {
+        return prisma.cmsSection.findMany({
+            where: { pageId },
+            orderBy: { sortOrder: 'asc' },
+        });
+    }
+
     async createSection(data: CreateCmsSectionData) {
         return prisma.cmsSection.create({
             data: {
