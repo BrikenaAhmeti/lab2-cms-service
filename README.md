@@ -91,6 +91,7 @@ This keeps authorization setup local without pulling Auth Service tables into th
 ```bash
 npm install
 cp .env.example .env
+npm run docker:up
 npm run prisma:generate
 npm run prisma:migrate
 npm run db:seed
@@ -132,6 +133,9 @@ This CMS service does not need OpenAI credentials or an OpenAI dependency. AI fe
 | `npm run build` | Compile TypeScript |
 | `npm start` | Run compiled service |
 | `npm run test` | Run Jest tests |
+| `npm run docker:up` | Start the local PostgreSQL container |
+| `npm run docker:down` | Stop the local PostgreSQL container |
+| `npm run docker:logs` | Tail local PostgreSQL container logs |
 | `npm run prisma:generate` | Generate Prisma client |
 | `npm run prisma:migrate` | Run Prisma development migration |
 | `npm run prisma:studio` | Open Prisma Studio |
