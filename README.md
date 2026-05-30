@@ -40,6 +40,13 @@ The Prisma schema creates only CMS-owned tables:
 
 ## API
 
+Swagger/OpenAPI is available when the service is running:
+
+```text
+GET /api/docs
+GET /api/docs.json
+```
+
 Admin CMS endpoints live under `/api/cms`.
 
 | Method | Path | Purpose |
@@ -56,6 +63,9 @@ Admin CMS endpoints live under `/api/cms`.
 | `PATCH` | `/api/cms/pages/:pageId/sections/:id/visibility` | Toggle section visibility |
 | `PUT` | `/api/cms/pages/:pageId/sections/:id` | Update section |
 | `DELETE` | `/api/cms/pages/:pageId/sections/:id` | Delete section |
+| `GET` | `/api/cms/sections/:id` | Get section by ID |
+| `PUT` | `/api/cms/sections/:id` | Update section by ID |
+| `DELETE` | `/api/cms/sections/:id` | Delete section by ID |
 | `GET` | `/api/cms/banners` | List banners |
 | `GET` | `/api/cms/banners/:id` | Get banner by ID |
 | `POST` | `/api/cms/banners` | Create banner |
@@ -109,6 +119,10 @@ DATABASE_URL="postgresql://postgres:postgres@localhost:5432/medsphere_cms?schema
 ```
 
 The CMS service must use its own PostgreSQL database URL, separate from Auth, Core, Notification, and AI services.
+
+## AI / OpenAI
+
+This CMS service does not need OpenAI credentials or an OpenAI dependency. AI features from the product plan belong to the separate AI Service and the public frontend widget; this service only stores CMS content, serves public CMS reads, and emits Socket.IO live preview updates.
 
 ## Scripts
 
