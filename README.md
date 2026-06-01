@@ -115,11 +115,15 @@ GET /health
 ```env
 PORT=3009
 NODE_ENV=development
-CORS_ORIGIN=http://localhost:5173
+CORS_ORIGIN=http://localhost:5173,http://localhost:3000
 DATABASE_URL="postgresql://postgres:postgres@localhost:5432/medsphere_cms?schema=public"
 ```
 
 The CMS service must use its own PostgreSQL database URL, separate from Auth, Core, Notification, and AI services.
+
+`CORS_ORIGIN` accepts a comma-separated list. In non-production environments,
+localhost, 127.0.0.1, and IPv6 localhost origins are also allowed on any port for
+local frontend development.
 
 ## AI / OpenAI
 

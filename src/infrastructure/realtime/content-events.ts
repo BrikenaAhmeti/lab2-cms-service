@@ -1,6 +1,7 @@
 import { Server as HttpServer } from 'http';
 import { EventEmitter } from 'events';
 import { Server as SocketServer } from 'socket.io';
+import { isCorsOriginAllowed } from '../../config/cors';
 
 export interface CmsContentUpdatedPayload {
     slug: string;
@@ -14,10 +15,13 @@ class ContentEvents extends EventEmitter {
 
 export const contentEvents = new ContentEvents();
 
-export function attachRealtimeServer(httpServer: HttpServer, corsOrigin?: string) {
+export function attachRealtimeServer(httpServer: HttpServer) {
     const io = new SocketServer(httpServer, {
         cors: {
-            origin: corsOrigin || '*',
+            credentials: true,
+            origin(origin, callback) {
+                callback(null, isCorsOriginAllowed(origin));
+            },
         },
     });
 
