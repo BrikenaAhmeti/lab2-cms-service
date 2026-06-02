@@ -166,7 +166,7 @@ const defaultPages: SeedPage[] = [
         title: 'Home',
         metaTitle: 'MedSphere | Health, Connected',
         metaDescription:
-            'A polished MedSphere public homepage with care highlights, services, doctors, FAQs, and trust-building content.',
+            'MedSphere connects patients, departments, care teams, records, diagnostics, and AI-assisted support in one healthcare platform.',
         isPublished: true,
         sections: [
             {
@@ -217,11 +217,11 @@ const defaultPages: SeedPage[] = [
             },
             {
                 type: 'TEXT',
-                title: 'Connected Care Tools',
+                title: 'One Connected Care Platform',
                 subtitle:
-                    'Inspired by the dashboard experience, these content blocks give the frontend strong material for polished cards and feature rows.',
+                    'From public discovery to patient portals, MedSphere keeps care information clear, secure, and easy to act on.',
                 body:
-                    'MedSphere combines human care with simple digital touchpoints so patients can understand services, clinicians, records, and support channels without friction.',
+                    'Patients can understand departments, services, records, results, billing, and support channels before they ever need to call the clinic.',
                 imageUrl: media.patientCare,
                 sortOrder: 2,
                 content: {
@@ -268,9 +268,9 @@ const defaultPages: SeedPage[] = [
             },
             {
                 type: 'TEXT',
-                title: 'Featured Services',
+                title: 'Services by Department',
                 subtitle:
-                    'A service card grid for the public website, focused on discovery rather than scheduling.',
+                    'Configurable service catalogs help every department explain what it offers, how care works, and what patients can expect.',
                 sortOrder: 3,
                 content: {
                     display: 'service-cards',
@@ -279,9 +279,9 @@ const defaultPages: SeedPage[] = [
             },
             {
                 type: 'TEXT',
-                title: 'Doctors Patients Trust',
+                title: 'Trusted Specialists',
                 subtitle:
-                    'Professional profile cards with specialties, ratings, and warm visual details.',
+                    'Meet care teams by specialty, focus area, department, and patient confidence signals.',
                 sortOrder: 4,
                 content: {
                     display: 'doctor-cards',
@@ -321,24 +321,24 @@ const defaultPages: SeedPage[] = [
                 type: 'FAQ',
                 title: 'Common Questions',
                 subtitle:
-                    'Helpful answers for the public site without storing operational records in CMS.',
+                    'Clear answers for patients exploring MedSphere before entering the secure portal.',
                 sortOrder: 6,
                 content: {
                     items: [
                         {
                             question: 'What can I find on the MedSphere website?',
                             answer:
-                                'You can explore services, departments, doctor profiles, contact information, visit preparation notes, and patient support resources.',
+                                'You can explore departments, services, doctor profiles, contact information, visit preparation notes, and patient support resources.',
                         },
                         {
-                            question: 'Does CMS store patient records?',
+                            question: 'How does MedSphere adapt to different clinics?',
                             answer:
-                                'No. This CMS only stores public website content such as pages, banners, and reusable sections.',
+                                'Admins configure departments, service catalogs, staff positions, and workflows so the platform can support general medicine, dental, ophthalmology, laboratory, physiotherapy, and more.',
                         },
                         {
-                            question: 'Can the frontend style these sections as cards?',
+                            question: 'Where do secure patient features live?',
                             answer:
-                                'Yes. Each section includes structured JSON for grids, stats, profiles, FAQs, and calls to action.',
+                                'Patients use the secure portal for records, prescriptions, lab results, messages, invoices, notifications, and AI-assisted explanations.',
                         },
                     ],
                 },
@@ -374,7 +374,7 @@ const defaultPages: SeedPage[] = [
                 subtitle:
                     'MedSphere brings clinic information, care-team details, digital guidance, and patient support into one coherent experience.',
                 body:
-                    'Our public website content is designed to help patients quickly understand where to go, who can help, and what each service provides.',
+                    'The platform helps patients quickly understand where to go, who can help, and how each service connects to the wider care journey.',
                 imageUrl: media.hospitalTeam,
                 sortOrder: 0,
                 content: {
@@ -388,7 +388,7 @@ const defaultPages: SeedPage[] = [
                 subtitle:
                     'Make healthcare information easier to understand before, during, and after each care interaction.',
                 body:
-                    'MedSphere supports patients with clear public content and supports care teams with structured, reusable CMS sections that are easy for the frontend to present beautifully.',
+                    'MedSphere gives care teams a configurable operating system for departments, staff, schedules, records, labs, pharmacy, billing, reporting, and communication.',
                 sortOrder: 1,
                 content: {
                     display: 'values',
@@ -408,7 +408,7 @@ const defaultPages: SeedPage[] = [
                         {
                             title: 'Privacy by Design',
                             description:
-                                'CMS content stays public while sensitive health workflows belong to secure services.',
+                                'Public content stays separate from protected clinical workflows, patient records, and secure portal data.',
                             icon: 'lock-keyhole',
                         },
                     ],
@@ -425,7 +425,7 @@ const defaultPages: SeedPage[] = [
                         { value: '12', label: 'Departments', description: 'Public service paths.' },
                         { value: '60+', label: 'Clinicians', description: 'Across specialty care teams.' },
                         { value: '99.9%', label: 'Content uptime', description: 'Designed for reliable access.' },
-                        { value: 'HIPAA-aware', label: 'Architecture', description: 'Sensitive data lives outside CMS.' },
+                        { value: 'Secure', label: 'Architecture', description: 'Public content is separated from protected clinical data.' },
                     ],
                 },
             },
@@ -433,7 +433,7 @@ const defaultPages: SeedPage[] = [
                 type: 'TEXT',
                 title: 'How MedSphere Helps',
                 subtitle:
-                    'A simple story section the frontend can render as steps or a timeline.',
+                    'A connected care journey that starts with clear information and continues through secure patient and staff portals.',
                 sortOrder: 3,
                 content: {
                     display: 'timeline',
@@ -497,7 +497,7 @@ const defaultPages: SeedPage[] = [
                 type: 'TEXT',
                 title: 'Care Departments',
                 subtitle:
-                    'Use these cards for a polished grid similar to the dashboard-style component system.',
+                    'Patients can scan department focus areas, common services, and support notes before choosing the right care path.',
                 sortOrder: 1,
                 content: {
                     display: 'department-cards',
@@ -576,7 +576,7 @@ const defaultPages: SeedPage[] = [
                         {
                             question: 'Are department pages clinical advice?',
                             answer:
-                                'No. Public CMS content is informational and should not replace direct medical advice from a clinician.',
+                                'No. Public content is informational and should not replace direct medical advice from a clinician.',
                         },
                     ],
                 },
@@ -595,9 +595,9 @@ const defaultPages: SeedPage[] = [
                 type: 'HERO',
                 title: 'Meet the Care Team',
                 subtitle:
-                    'Professional doctor cards help patients recognize specialties, care focus, and who may fit their needs.',
+                    'Professional doctor profiles help patients recognize specialties, care focus, and who may fit their needs.',
                 body:
-                    'Profiles are public website content only. Sensitive staff operations and clinical workflows belong outside CMS.',
+                    'Public profiles introduce care teams while secure staff operations stay inside role-based portals.',
                 imageUrl: media.hospitalTeam,
                 sortOrder: 0,
                 content: {
@@ -609,7 +609,7 @@ const defaultPages: SeedPage[] = [
                 type: 'TEXT',
                 title: 'Featured Doctors',
                 subtitle:
-                    'Profile data structured for cards, filters, carousels, or compact rows.',
+                    'Browse specialists by department, focus area, and patient confidence signals.',
                 sortOrder: 1,
                 content: {
                     display: 'doctor-directory',
@@ -619,9 +619,9 @@ const defaultPages: SeedPage[] = [
             },
             {
                 type: 'TEXT',
-                title: 'What Profile Cards Can Show',
+                title: 'What Patients Can Understand Quickly',
                 subtitle:
-                    'A supporting component for the frontend to render as icon rows or a feature list.',
+                    'Each profile gives patients the context they need before continuing into secure care workflows.',
                 sortOrder: 2,
                 content: {
                     display: 'feature-list',
@@ -641,7 +641,7 @@ const defaultPages: SeedPage[] = [
                         {
                             title: 'Clear Next Steps',
                             description:
-                                'Cards can link to department and service pages without CMS storing operational workflows.',
+                                'Profiles can guide patients toward relevant departments, services, and secure next steps.',
                             icon: 'arrow-right-circle',
                         },
                     ],
@@ -674,9 +674,9 @@ const defaultPages: SeedPage[] = [
                 type: 'HERO',
                 title: 'Services Made Easy to Compare',
                 subtitle:
-                    'Patients can scan service cards, learn what each care area supports, and choose the right information path.',
+                    'Patients can compare care areas, understand service scope, and choose the right information path.',
                 body:
-                    'The CMS provides content for public discovery while service execution remains in the dedicated frontend and domain services.',
+                    'MedSphere connects public service discovery with configurable departments, staff schedules, billing rules, and secure clinical workflows.',
                 imageUrl: media.diagnostics,
                 sortOrder: 0,
                 content: {
@@ -688,7 +688,7 @@ const defaultPages: SeedPage[] = [
                 type: 'TEXT',
                 title: 'Patient Services',
                 subtitle:
-                    'A polished service card set for the public site, inspired by the clean component layout in the reference.',
+                    'A clear service catalog for general medicine, specialty care, diagnostics, records support, and care navigation.',
                 sortOrder: 1,
                 content: {
                     display: 'service-cards',
@@ -715,7 +715,7 @@ const defaultPages: SeedPage[] = [
                 type: 'TEXT',
                 title: 'Digital Support',
                 subtitle:
-                    'Use this section for rows or cards that echo the AI and dashboard pieces in the design reference.',
+                    'Digital support helps patients understand services, messages, records, and care instructions across the platform.',
                 imageUrl: media.patientCare,
                 sortOrder: 2,
                 content: {
@@ -757,12 +757,12 @@ const defaultPages: SeedPage[] = [
                         {
                             question: 'Where do clinical workflows live?',
                             answer:
-                                'CMS stores public content only. Clinical workflows and operational records live in separate services.',
+                                'Clinical workflows and operational records live in secure role-based services for doctors, nurses, lab teams, pharmacy, billing, and patients.',
                         },
                         {
-                            question: 'Can the frontend add interactive service actions?',
+                            question: 'Can MedSphere support new specialties?',
                             answer:
-                                'Yes. The frontend can add its own actions while using CMS for public copy, cards, and FAQs.',
+                                'Yes. Administrators can add departments, service types, staff positions, prices, durations, and workflows without code changes.',
                         },
                     ],
                 },
@@ -808,7 +808,7 @@ const defaultPages: SeedPage[] = [
                 type: 'TEXT',
                 title: 'Contact Channels',
                 subtitle:
-                    'Structured cards for a clean public contact section.',
+                    'Reach the right team for public questions, patient support, records guidance, and billing help.',
                 sortOrder: 1,
                 content: {
                     display: 'contact-cards',
@@ -910,7 +910,7 @@ const defaultBanners: SeedBanner[] = [
     {
         title: 'AI Care Assistant Preview',
         message:
-            'Guide patients through services, doctor profiles, records help, and clinic information with a polished AI support entry point.',
+            'Guide patients through departments, services, doctor profiles, records help, and clinic information with AI-assisted support.',
         imageUrl: media.heroClinic,
         linkUrl: '/services',
         startDate: null,
@@ -919,9 +919,9 @@ const defaultBanners: SeedBanner[] = [
         sortOrder: 0,
     },
     {
-        title: 'Secure Records Guidance',
+        title: 'Secure Health Records',
         message:
-            'Help patients understand how to access documents, summaries, and public records support without exposing private data.',
+            'Help patients understand records access, summaries, prescriptions, and lab-result guidance before entering the secure portal.',
         imageUrl: media.patientCare,
         linkUrl: '/contact',
         startDate: null,
@@ -930,9 +930,9 @@ const defaultBanners: SeedBanner[] = [
         sortOrder: 1,
     },
     {
-        title: 'Meet the MedSphere Care Team',
+        title: 'Care Teams Across Specialties',
         message:
-            'Highlight trusted clinicians, specialties, ratings, and patient-friendly profile cards on the public website.',
+            'Introduce clinicians, specialties, department focus areas, and the coordinated care model behind MedSphere.',
         imageUrl: media.hospitalTeam,
         linkUrl: '/doctors',
         startDate: null,
@@ -1070,11 +1070,19 @@ async function seedPages() {
 }
 
 async function seedBanners() {
+    const staleBannerTitles = [
+        'Secure Records Guidance',
+        'Meet the MedSphere Care Team',
+    ];
+
     await prisma.$transaction([
         prisma.cmsBanner.deleteMany({
             where: {
                 title: {
-                    in: defaultBanners.map((banner) => banner.title),
+                    in: [
+                        ...defaultBanners.map((banner) => banner.title),
+                        ...staleBannerTitles,
+                    ],
                 },
             },
         }),
