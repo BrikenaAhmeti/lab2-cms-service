@@ -39,14 +39,6 @@ const media = {
         'https://images.unsplash.com/photo-1582750433449-648ed127bb54?auto=format&fit=crop&w=1200&q=80',
     careRoom:
         'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=1200&q=80',
-    doctorSarah:
-        'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&w=800&q=80',
-    doctorMason:
-        'https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&w=800&q=80',
-    doctorElena:
-        'https://images.unsplash.com/photo-1537368910025-700350fe46c7?auto=format&fit=crop&w=800&q=80',
-    doctorAmira:
-        'https://images.unsplash.com/photo-1594824476967-48c8b964273f?auto=format&fit=crop&w=800&q=80',
     diagnostics:
         'https://images.unsplash.com/photo-1579154204601-01588f351e67?auto=format&fit=crop&w=1200&q=80',
     patientCare:
@@ -118,45 +110,6 @@ const featuredServices = [
             'Digital check-ins, secure messaging, and care instructions after visits.',
         icon: 'video',
         href: '/services',
-    },
-];
-
-const doctorProfiles = [
-    {
-        name: 'Dr. Sarah Johnson',
-        role: 'General Physician',
-        specialty: 'Primary Care',
-        rating: '4.9',
-        reviews: 128,
-        imageUrl: media.doctorSarah,
-        tags: ['Preventive care', 'Family medicine', 'Care planning'],
-    },
-    {
-        name: 'Dr. Mason Lee',
-        role: 'Cardiologist',
-        specialty: 'Heart Health',
-        rating: '4.8',
-        reviews: 96,
-        imageUrl: media.doctorMason,
-        tags: ['Cardiac screening', 'Blood pressure', 'Long-term follow-up'],
-    },
-    {
-        name: 'Dr. Elena Rivera',
-        role: 'Dermatologist',
-        specialty: 'Skin Health',
-        rating: '4.9',
-        reviews: 87,
-        imageUrl: media.doctorElena,
-        tags: ['Skin checks', 'Acne care', 'Treatment plans'],
-    },
-    {
-        name: 'Dr. Amira Patel',
-        role: 'Pediatrician',
-        specialty: 'Child and Teen Care',
-        rating: '4.9',
-        reviews: 112,
-        imageUrl: media.doctorAmira,
-        tags: ['Well-child visits', 'Immunization guidance', 'Family support'],
     },
 ];
 
@@ -285,7 +238,8 @@ const defaultPages: SeedPage[] = [
                 sortOrder: 4,
                 content: {
                     display: 'doctor-cards',
-                    doctors: doctorProfiles.slice(0, 3),
+                    limit: 3,
+                    filters: ['Primary Care', 'Cardiology', 'Pediatrics'],
                 },
             },
             {
@@ -603,61 +557,6 @@ const defaultPages: SeedPage[] = [
                 content: {
                     eyebrow: 'Doctor profiles',
                     actions: [{ label: 'Explore Departments', href: '/departments', style: 'primary' }],
-                },
-            },
-            {
-                type: 'TEXT',
-                title: 'Featured Doctors',
-                subtitle:
-                    'Browse specialists by department, focus area, and patient confidence signals.',
-                sortOrder: 1,
-                content: {
-                    display: 'doctor-directory',
-                    filters: ['Primary Care', 'Heart Health', 'Skin Health', 'Child and Teen Care'],
-                    doctors: doctorProfiles,
-                },
-            },
-            {
-                type: 'TEXT',
-                title: 'What Patients Can Understand Quickly',
-                subtitle:
-                    'Each profile gives patients the context they need before continuing into secure care workflows.',
-                sortOrder: 2,
-                content: {
-                    display: 'feature-list',
-                    features: [
-                        {
-                            title: 'Specialty and Focus',
-                            description:
-                                'Patients can quickly scan each doctor profile by specialty and focus tags.',
-                            icon: 'badge-check',
-                        },
-                        {
-                            title: 'Patient Confidence Signals',
-                            description:
-                                'Ratings, review counts, and short role descriptions make cards feel complete.',
-                            icon: 'star',
-                        },
-                        {
-                            title: 'Clear Next Steps',
-                            description:
-                                'Profiles can guide patients toward relevant departments, services, and secure next steps.',
-                            icon: 'arrow-right-circle',
-                        },
-                    ],
-                },
-            },
-            {
-                type: 'CTA',
-                title: 'Find the Right Care Area',
-                subtitle:
-                    'Pair doctor profiles with service and department content for a complete browsing experience.',
-                sortOrder: 3,
-                content: {
-                    actions: [
-                        { label: 'Browse Departments', href: '/departments', style: 'primary' },
-                        { label: 'View Services', href: '/services', style: 'secondary' },
-                    ],
                 },
             },
         ],
