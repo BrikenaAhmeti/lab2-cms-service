@@ -48,6 +48,23 @@ import {
     ListCmsSectionsQuery,
     ListPublicCmsBannersQuery,
 } from '../application/queries/cms.queries';
+import { isSafeAssetUrl, isSafeLinkUrl } from '../services/cms.service';
+
+const optionalAssetUrlSchema = z
+    .string()
+    .trim()
+    .max(500)
+    .refine(isSafeAssetUrl, 'URL must use http(s) or an internal path')
+    .nullable()
+    .optional();
+
+const optionalLinkUrlSchema = z
+    .string()
+    .trim()
+    .max(500)
+    .refine(isSafeLinkUrl, 'URL must use http(s), mailto, tel, anchor, or an internal path')
+    .nullable()
+    .optional();
 
 const createPageSchema = z.object({
     slug: z.string().min(1).max(120).optional(),
@@ -64,7 +81,7 @@ const createSectionSchema = z.object({
     title: z.string().max(160).nullable().optional(),
     subtitle: z.string().max(255).nullable().optional(),
     body: z.string().nullable().optional(),
-    imageUrl: z.string().url().max(500).nullable().optional(),
+    imageUrl: optionalAssetUrlSchema,
     content: z.unknown().nullable().optional(),
     sortOrder: z.number().int().min(0).optional(),
     isVisible: z.boolean().optional(),
@@ -88,8 +105,8 @@ const reorderSectionsSchema = z.object({
 const createBannerSchema = z.object({
     title: z.string().min(2).max(160),
     message: z.string().min(1),
-    imageUrl: z.string().url().max(500).nullable().optional(),
-    linkUrl: z.string().url().max(500).nullable().optional(),
+    imageUrl: optionalAssetUrlSchema,
+    linkUrl: optionalLinkUrlSchema,
     startDate: z.coerce.date().nullable().optional(),
     endDate: z.coerce.date().nullable().optional(),
     isActive: z.boolean().optional(),

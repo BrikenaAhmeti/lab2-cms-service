@@ -17,7 +17,11 @@ export function isCorsOriginAllowed(origin?: string) {
 
     const allowedOrigins = configuredOrigins();
 
-    if (allowedOrigins.includes('*') || allowedOrigins.includes(origin)) {
+    if (allowedOrigins.includes(origin)) {
+        return true;
+    }
+
+    if (allowedOrigins.includes('*') && env.nodeEnv !== 'production') {
         return true;
     }
 
@@ -27,6 +31,10 @@ export function isCorsOriginAllowed(origin?: string) {
 export const corsOptions: CorsOptions = {
     credentials: true,
     origin(origin, callback) {
-        callback(null, isCorsOriginAllowed(origin));
+        if (isCorsOriginAllowed(origin)) {
+            return callback(null, true);
+        }
+
+        return callback(null, false);
     },
 };

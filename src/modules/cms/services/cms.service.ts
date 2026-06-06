@@ -34,6 +34,136 @@ function cleanText(value: string | null | undefined) {
     return trimmed === '' ? null : trimmed;
 }
 
+export function isSafeAssetUrl(value: string | null | undefined) {
+    const trimmed = value?.trim();
+
+    if (!trimmed) {
+        return true;
+    }
+
+    if (trimmed.startsWith('/') && !trimmed.startsWith('//')) {
+        return true;
+    }
+
+    try {
+        const url = new URL(trimmed);
+        return ['http:', 'https:'].includes(url.protocol);
+    } catch {
+        return false;
+    }
+}
+
+export function isSafeLinkUrl(value: string | null | undefined) {
+    const trimmed = value?.trim();
+
+    if (!trimmed) {
+        return true;
+    }
+
+    if (
+        trimmed.startsWith('#') ||
+        (trimmed.startsWith('/') && !trimmed.startsWith('//'))
+    ) {
+        return true;
+    }
+
+    try {
+        const url = new URL(trimmed);
+        return ['http:', 'https:', 'mailto:', 'tel:'].includes(url.protocol);
+    } catch {
+        return false;
+    }
+}
+
+function isCmsUrlKey(key: string) {
+    const normalized = key.trim().toLowerCase();
+    return ['href', 'link', 'src', 'url'].includes(normalized) ||
+        normalized.endsWith('url');
+}
+
+function isCmsAssetUrlKey(key: string) {
+    const normalized = key.trim().toLowerCase();
+    return normalized.includes('image') || normalized === 'src';
+}
+
+function validateCmsContentUrl(key: string, value: string, path: string) {
+    const isSafe = isCmsAssetUrlKey(key)
+        ? isSafeAssetUrl(value)
+        : isSafeLinkUrl(value);
+
+    if (!isSafe) {
+        throw new AppError(`${path} must be a safe URL`, 400);
+    }
+
+    return value.trim();
+}
+
+function sanitizeCmsContent(value: unknown, path = 'content', depth = 0): unknown {
+    if (value === undefined || value === null) {
+        return value;
+    }
+
+    if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+        return value;
+    }
+
+    if (depth > 8) {
+        throw new AppError('CMS content is too deeply nested', 400);
+    }
+
+    if (Array.isArray(value)) {
+        if (value.length > 100) {
+            throw new AppError(`${path} cannot contain more than 100 items`, 400);
+        }
+
+        return value.map((item, index) => sanitizeCmsContent(item, `${path}[${index}]`, depth + 1));
+    }
+
+    if (typeof value !== 'object') {
+        throw new AppError(`${path} contains an unsupported value`, 400);
+    }
+
+    const entries = Object.entries(value as Record<string, unknown>);
+
+    if (entries.length > 100) {
+        throw new AppError(`${path} cannot contain more than 100 fields`, 400);
+    }
+
+    return Object.fromEntries(
+        entries.map(([key, item]) => {
+            if (['__proto__', 'constructor', 'prototype'].includes(key)) {
+                throw new AppError(`${path}.${key} is not allowed`, 400);
+            }
+
+            if (typeof item === 'string' && isCmsUrlKey(key)) {
+                return [key, validateCmsContentUrl(key, item, `${path}.${key}`)];
+            }
+
+            return [key, sanitizeCmsContent(item, `${path}.${key}`, depth + 1)];
+        }),
+    );
+}
+
+function cleanAssetUrl(value: string | null | undefined) {
+    const url = cleanText(value);
+
+    if (url && !isSafeAssetUrl(url)) {
+        throw new AppError('URL must use http(s) or an internal path', 400);
+    }
+
+    return url;
+}
+
+function cleanLinkUrl(value: string | null | undefined) {
+    const url = cleanText(value);
+
+    if (url && !isSafeLinkUrl(url)) {
+        throw new AppError('URL must use http(s), mailto, tel, anchor, or an internal path', 400);
+    }
+
+    return url;
+}
+
 export class CmsService {
     constructor(private readonly cmsRepository: CmsRepository) { }
 
@@ -162,7 +292,8 @@ export class CmsService {
             title: cleanText(data.title),
             subtitle: cleanText(data.subtitle),
             body: cleanText(data.body),
-            imageUrl: cleanText(data.imageUrl),
+            imageUrl: cleanAssetUrl(data.imageUrl),
+            content: sanitizeCmsContent(data.content),
             sortOrder,
         });
     }
@@ -179,7 +310,8 @@ export class CmsService {
             title: cleanText(data.title),
             subtitle: cleanText(data.subtitle),
             body: cleanText(data.body),
-            imageUrl: cleanText(data.imageUrl),
+            imageUrl: cleanAssetUrl(data.imageUrl),
+            content: sanitizeCmsContent(data.content),
         });
     }
 
@@ -249,8 +381,8 @@ export class CmsService {
             ...data,
             title: data.title.trim(),
             message: data.message.trim(),
-            imageUrl: cleanText(data.imageUrl),
-            linkUrl: cleanText(data.linkUrl),
+            imageUrl: cleanAssetUrl(data.imageUrl),
+            linkUrl: cleanLinkUrl(data.linkUrl),
         });
     }
 
@@ -269,8 +401,8 @@ export class CmsService {
             ...data,
             title: data.title?.trim(),
             message: data.message?.trim(),
-            imageUrl: cleanText(data.imageUrl),
-            linkUrl: cleanText(data.linkUrl),
+            imageUrl: cleanAssetUrl(data.imageUrl),
+            linkUrl: cleanLinkUrl(data.linkUrl),
         });
     }
 
