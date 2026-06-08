@@ -6,8 +6,9 @@ import swaggerUi from 'swagger-ui-express';
 import { openApiDocument } from './docs/openapi';
 import { errorHandler } from './shared/middleware/error-handler';
 import { notFoundHandler } from './shared/middleware/not-found';
+import { createRateLimiter } from './shared/middleware/rate-limit';
 import { cmsRoutes, publicCmsRoutes } from './modules/cms/presentation/cms.routes';
-import { env } from './config/env';
+import { corsOptions } from './config/cors';
 
 export function createApp() {
     const app = express();
@@ -23,7 +24,12 @@ export function createApp() {
             },
         }),
     );
-    app.use(cors({ origin: env.corsOrigin }));
+    app.use(cors(corsOptions));
+    app.use(createRateLimiter({
+        windowMs: 15 * 60_000,
+        maxRequests: 500,
+        skip: (req) => req.method === 'OPTIONS' || req.path === '/health',
+    }));
     app.use(morgan('dev'));
     app.use(express.json());
 

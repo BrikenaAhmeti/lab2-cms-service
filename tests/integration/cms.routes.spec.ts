@@ -29,6 +29,18 @@ describe('CMS routes', () => {
         );
     });
 
+    it('allows local frontend origins for CMS reads during development', async () => {
+        const response = await request(app)
+            .get('/health')
+            .set('Origin', 'http://localhost:3000');
+
+        expect(response.status).toBe(200);
+        expect(response.header['access-control-allow-origin']).toBe(
+            'http://localhost:3000',
+        );
+        expect(response.header['access-control-allow-credentials']).toBe('true');
+    });
+
     it('serves Swagger UI', async () => {
         const response = await request(app).get('/api/docs/');
 

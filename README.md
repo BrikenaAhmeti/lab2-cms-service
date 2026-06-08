@@ -1,142 +1,156 @@
 # MedSphere CMS Service
 
-## Overview
+CMS microservice for the Lab2 MedSphere public website. It owns editable public pages, page sections, banners, public read-only CMS endpoints, and Socket.IO `cms:content-updated` live preview events.
 
-This repository is only the **MedSphere CMS Service** setup from MS-37. It owns the public website content tables and API surface:
+It does not own departments, staff, patients, appointments, billing, reports, auth users, notifications, or AI workflows.
 
-- CMS pages
-- CMS page sections
-- CMS banners
-- Public read-only CMS endpoints
-- Socket.IO `cms:content-updated` events for live preview refreshes
+## Port
 
-Core service domains such as departments, staff, patients, appointments, billing, reports, and auth user storage do not belong in this service.
+- Local and Docker API: `http://localhost:3009`
+- Container port: `3009`
+- Health: `GET /health`
+- Admin API base path: `/api/cms`
+- Public API base path: `/api/public/cms`
+- Swagger UI: `http://localhost:3009/api/docs`
+- OpenAPI JSON: `http://localhost:3009/api/docs.json`
+- Socket.IO origin: `http://localhost:3009`
 
-## Tech Stack
+## Data Store
 
-- Node.js + Express + TypeScript
-- Prisma + PostgreSQL
-- CQRS-style command/query handlers
-- Zod request validation
-- Socket.IO live preview events
-- Jest + Supertest
+- PostgreSQL via Prisma.
 
-## Data Model
+Docker Compose starts a dedicated Postgres container and runs Prisma migrations before the service starts in development mode.
 
-The Prisma schema creates only CMS-owned tables:
+Owned tables:
 
 - `cms_pages`
 - `cms_sections`
 - `cms_banners`
 
-`CMSSectionType` supports:
+## Environment
 
-- `HERO`
-- `TEXT`
-- `CTA`
-- `FAQ`
-- `TESTIMONIALS`
-- `STATS`
+Copy `.env.example` to `.env`.
 
-## API
+Service keys:
 
-Swagger/OpenAPI is available when the service is running:
+- `PORT`
+- `NODE_ENV`
+- `CORS_ORIGIN`
+- `DATABASE_URL`
 
-```text
-GET /api/docs
-GET /api/docs.json
-```
+Docker/Postgres helper key:
 
-Admin CMS endpoints live under `/api/cms`.
+- `POSTGRES_PORT`
 
-| Method | Path | Purpose |
-| --- | --- | --- |
-| `GET` | `/api/cms/pages` | List pages with sections |
-| `POST` | `/api/cms/pages` | Create page |
-| `GET` | `/api/cms/pages/:id` | Get page by ID |
-| `PUT` | `/api/cms/pages/:id` | Update page |
-| `DELETE` | `/api/cms/pages/:id` | Delete page |
-| `GET` | `/api/cms/pages/:pageId/sections` | List sections for a page |
-| `POST` | `/api/cms/pages/:pageId/sections` | Create section |
-| `PATCH` | `/api/cms/pages/:pageId/sections/reorder` | Reorder sections |
-| `GET` | `/api/cms/pages/:pageId/sections/:id` | Get section by ID |
-| `PATCH` | `/api/cms/pages/:pageId/sections/:id/visibility` | Toggle section visibility |
-| `PUT` | `/api/cms/pages/:pageId/sections/:id` | Update section |
-| `DELETE` | `/api/cms/pages/:pageId/sections/:id` | Delete section |
-| `GET` | `/api/cms/sections/:id` | Get section by ID |
-| `PUT` | `/api/cms/sections/:id` | Update section by ID |
-| `DELETE` | `/api/cms/sections/:id` | Delete section by ID |
-| `GET` | `/api/cms/banners` | List banners |
-| `GET` | `/api/cms/banners/:id` | Get banner by ID |
-| `POST` | `/api/cms/banners` | Create banner |
-| `PUT` | `/api/cms/banners/:id` | Update banner |
-| `DELETE` | `/api/cms/banners/:id` | Delete banner |
+`CORS_ORIGIN` accepts a comma-separated list. Localhost origins are allowed in non-production for frontend development.
 
-Public website endpoints live under `/api/public/cms`.
-
-| Method | Path | Purpose |
-| --- | --- | --- |
-| `GET` | `/api/public/cms/pages/:slug` | Published page with visible sections |
-| `GET` | `/api/public/cms/banners` | Active banners for current datetime |
-
-Mutating CMS endpoints expect either:
-
-- `x-user-role: super_admin`
-- `x-user-permissions: cms:edit`
-
-This keeps authorization setup local without pulling Auth Service tables into the CMS database.
-
-## Local Setup
+## Start Locally
 
 ```bash
 npm install
 cp .env.example .env
-npm run docker:up
+docker compose up -d postgres
 npm run prisma:generate
 npm run prisma:migrate
 npm run db:seed
 npm run dev
 ```
 
-Default URL:
+Stop the local Postgres container:
 
-```text
-http://localhost:3009
+```bash
+docker compose down
 ```
 
-Health check:
+## Run With Docker
 
-```text
-GET /health
+```bash
+cp .env.example .env
+npm run docker:up
+npm run docker:logs
+npm run docker:ps
 ```
 
-## Environment
+Stop the stack:
 
-```env
-PORT=3009
-NODE_ENV=development
-CORS_ORIGIN=http://localhost:5173
-DATABASE_URL="postgresql://postgres:postgres@localhost:5432/medsphere_cms?schema=public"
+```bash
+npm run docker:down
 ```
 
-The CMS service must use its own PostgreSQL database URL, separate from Auth, Core, Notification, and AI services.
+## Build And Tests
 
-## AI / OpenAI
+```bash
+npm run build
+npm run test
+```
 
-This CMS service does not need OpenAI credentials or an OpenAI dependency. AI features from the product plan belong to the separate AI Service and the public frontend widget; this service only stores CMS content, serves public CMS reads, and emits Socket.IO live preview updates.
+Additional commands:
 
-## Scripts
+```bash
+npm run test:watch
+npm run docker:logs
+npm run docker:ps
+npm run prisma:generate
+npm run prisma:migrate
+npm run prisma:studio
+npm run db:seed
+```
 
-| Script | Description |
-| --- | --- |
-| `npm run dev` | Run service with `tsx` and `nodemon` |
-| `npm run build` | Compile TypeScript |
-| `npm start` | Run compiled service |
-| `npm run test` | Run Jest tests |
-| `npm run docker:up` | Start the local PostgreSQL container |
-| `npm run docker:down` | Stop the local PostgreSQL container |
-| `npm run docker:logs` | Tail local PostgreSQL container logs |
-| `npm run prisma:generate` | Generate Prisma client |
-| `npm run prisma:migrate` | Run Prisma development migration |
-| `npm run prisma:studio` | Open Prisma Studio |
-| `npm run db:seed` | Seed default public pages |
+## Main Routes
+
+Admin CMS:
+
+- `GET /api/cms/pages`
+- `POST /api/cms/pages`
+- `GET /api/cms/pages/:id`
+- `PUT /api/cms/pages/:id`
+- `DELETE /api/cms/pages/:id`
+- `GET /api/cms/pages/:pageId/sections`
+- `POST /api/cms/pages/:pageId/sections`
+- `PATCH /api/cms/pages/:pageId/sections/reorder`
+- `GET /api/cms/pages/:pageId/sections/:id`
+- `PATCH /api/cms/pages/:pageId/sections/:id/visibility`
+- `PUT /api/cms/pages/:pageId/sections/:id`
+- `DELETE /api/cms/pages/:pageId/sections/:id`
+- `GET /api/cms/sections/:id`
+- `PUT /api/cms/sections/:id`
+- `DELETE /api/cms/sections/:id`
+- `GET /api/cms/banners`
+- `GET /api/cms/banners/:id`
+- `POST /api/cms/banners`
+- `PUT /api/cms/banners/:id`
+- `DELETE /api/cms/banners/:id`
+
+Public CMS:
+
+- `GET /api/public/cms/pages/:slug`
+- `GET /api/public/cms/banners`
+
+Socket.IO:
+
+- Clients join the `cms-preview` room.
+- Server emits `cms:content-updated` after content changes.
+
+## Access
+
+Mutating CMS routes require either:
+
+- `x-user-role: super_admin`
+- `x-user-permissions: cms:edit`
+
+Public routes are read-only.
+
+## Database Normalization
+
+The Prisma schema is normalized to 3NF for CMS-owned relational data:
+
+- `CmsPage` owns page metadata and slug uniqueness.
+- `CmsSection` belongs to one page and stores ordered page sections separately from page metadata.
+- `CmsBanner` is independent because banners can be shown across public pages.
+
+`CmsSection.content` is JSON by design for flexible section-specific payloads such as stats, FAQs, testimonials, and dynamic source settings. Reusable healthcare domain data, such as doctors and departments, remains owned by Core and is referenced from CMS content only as display configuration.
+
+## Notes
+
+- Deleting pages cascades to page sections.
+- Live preview updates are best-effort realtime events; REST reads remain the source of truth.

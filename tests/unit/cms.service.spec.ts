@@ -151,4 +151,84 @@ describe('CmsService', () => {
 
         expect(repository.createBanner).not.toHaveBeenCalled();
     });
+
+    it('rejects unsafe banner link URLs', async () => {
+        await expect(
+            service.createBanner({
+                title: 'Unsafe banner',
+                message: 'Do not render this link',
+                linkUrl: 'javascript:alert(1)',
+            }),
+        ).rejects.toBeInstanceOf(AppError);
+
+        expect(repository.createBanner).not.toHaveBeenCalled();
+    });
+
+    it('rejects unsafe nested CMS content URLs', async () => {
+        repository.findPageById.mockResolvedValue({
+            id: pageId,
+            slug: 'home',
+            title: 'Home',
+            isPublished: true,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+        });
+        repository.getNextSectionSortOrder.mockResolvedValue(0);
+
+        await expect(
+            service.createSection(pageId, {
+                type: 'CTA',
+                title: 'Book care',
+                content: {
+                    actions: [
+                        {
+                            label: 'Book now',
+                            href: 'javascript:alert(1)',
+                        },
+                    ],
+                },
+            }),
+        ).rejects.toBeInstanceOf(AppError);
+
+        expect(repository.createSection).not.toHaveBeenCalled();
+    });
+
+    it('allows safe internal CMS links', async () => {
+        repository.findPageById.mockResolvedValue({
+            id: pageId,
+            slug: 'home',
+            title: 'Home',
+            isPublished: true,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+        });
+        repository.getNextSectionSortOrder.mockResolvedValue(0);
+        repository.createSection.mockResolvedValue({
+            id: sectionId,
+            pageId,
+            type: 'CTA',
+            title: 'Book care',
+            content: { actions: [{ label: 'Book now', href: '/book-appointment' }] },
+            sortOrder: 0,
+            isVisible: true,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+        });
+
+        await service.createSection(pageId, {
+            type: 'CTA',
+            title: 'Book care',
+            content: {
+                actions: [{ label: 'Book now', href: '/book-appointment' }],
+            },
+        });
+
+        expect(repository.createSection).toHaveBeenCalledWith(
+            expect.objectContaining({
+                content: {
+                    actions: [{ label: 'Book now', href: '/book-appointment' }],
+                },
+            }),
+        );
+    });
 });
