@@ -2,7 +2,7 @@
 
 CMS microservice for the Lab2 MedSphere public website. It owns editable public pages, page sections, banners, public read-only CMS endpoints, and Socket.IO `cms:content-updated` live preview events.
 
-It does not own departments, staff, patients, appointments, billing, reports, auth users, or AI workflows.
+It does not own departments, staff, patients, appointments, billing, reports, auth users, notifications, or AI workflows.
 
 ## Port
 
@@ -11,11 +11,15 @@ It does not own departments, staff, patients, appointments, billing, reports, au
 - Health: `GET /health`
 - Admin API base path: `/api/cms`
 - Public API base path: `/api/public/cms`
+- Swagger UI: `http://localhost:3009/api/docs`
+- OpenAPI JSON: `http://localhost:3009/api/docs.json`
+- Socket.IO origin: `http://localhost:3009`
 
-## Data Stores
+## Data Store
 
 - PostgreSQL via Prisma.
-- Docker Compose starts a dedicated `postgres` container.
+
+Docker Compose starts a dedicated Postgres container and runs Prisma migrations before the service starts in development mode.
 
 Owned tables:
 
@@ -23,7 +27,7 @@ Owned tables:
 - `cms_sections`
 - `cms_banners`
 
-## Environment Keys
+## Environment
 
 Copy `.env.example` to `.env`.
 
@@ -34,9 +38,11 @@ Service keys:
 - `CORS_ORIGIN`
 - `DATABASE_URL`
 
-Docker/Postgres helper keys:
+Docker/Postgres helper key:
 
 - `POSTGRES_PORT`
+
+`CORS_ORIGIN` accepts a comma-separated list. Localhost origins are allowed in non-production for frontend development.
 
 ## Start Locally
 
@@ -71,8 +77,6 @@ Stop the stack:
 npm run docker:down
 ```
 
-Docker starts Postgres, applies Prisma migrations, generates the Prisma client, and runs the CMS Service in development mode.
-
 ## Build And Tests
 
 ```bash
@@ -84,20 +88,17 @@ Additional commands:
 
 ```bash
 npm run test:watch
+npm run docker:logs
+npm run docker:ps
 npm run prisma:generate
 npm run prisma:migrate
 npm run prisma:studio
 npm run db:seed
 ```
 
-## Swagger
-
-- Swagger UI: `http://localhost:3009/api/docs`
-- OpenAPI JSON: `http://localhost:3009/api/docs.json`
-
-Swagger covers health, admin CMS pages, CMS sections, CMS banners, and public CMS reads.
-
 ## Main Routes
+
+Admin CMS:
 
 - `GET /api/cms/pages`
 - `POST /api/cms/pages`
@@ -119,10 +120,37 @@ Swagger covers health, admin CMS pages, CMS sections, CMS banners, and public CM
 - `POST /api/cms/banners`
 - `PUT /api/cms/banners/:id`
 - `DELETE /api/cms/banners/:id`
+
+Public CMS:
+
 - `GET /api/public/cms/pages/:slug`
 - `GET /api/public/cms/banners`
 
+Socket.IO:
+
+- Clients join the `cms-preview` room.
+- Server emits `cms:content-updated` after content changes.
+
+## Access
+
+Mutating CMS routes require either:
+
+- `x-user-role: super_admin`
+- `x-user-permissions: cms:edit`
+
+Public routes are read-only.
+
+## Database Normalization
+
+The Prisma schema is normalized to 3NF for CMS-owned relational data:
+
+- `CmsPage` owns page metadata and slug uniqueness.
+- `CmsSection` belongs to one page and stores ordered page sections separately from page metadata.
+- `CmsBanner` is independent because banners can be shown across public pages.
+
+`CmsSection.content` is JSON by design for flexible section-specific payloads such as stats, FAQs, testimonials, and dynamic source settings. Reusable healthcare domain data, such as doctors and departments, remains owned by Core and is referenced from CMS content only as display configuration.
+
 ## Notes
 
-- Mutating CMS routes require `x-user-role: super_admin` or `x-user-permissions: cms:edit`.
-- `CORS_ORIGIN` accepts a comma-separated list. Localhost origins are allowed in non-production for frontend development.
+- Deleting pages cascades to page sections.
+- Live preview updates are best-effort realtime events; REST reads remain the source of truth.
