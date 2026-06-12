@@ -1,0 +1,73 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum CMSSectionType {
+  HERO
+  TEXT
+  CTA
+  FAQ
+  TESTIMONIALS
+  STATS
+}
+
+model CmsPage {
+  id              String       @id @default(uuid()) @db.Uuid
+  slug            String       @unique @db.VarChar(120)
+  title           String       @db.VarChar(160)
+  metaTitle       String?      @map("meta_title") @db.VarChar(160)
+  metaDescription String?      @map("meta_description") @db.VarChar(255)
+  isPublished     Boolean      @default(false) @map("is_published")
+  createdBy       String?      @map("created_by") @db.Uuid
+  updatedBy       String?      @map("updated_by") @db.Uuid
+  createdAt       DateTime     @default(now()) @map("created_at")
+  updatedAt       DateTime     @updatedAt @map("updated_at")
+  sections        CmsSection[]
+
+  @@map("cms_pages")
+}
+
+model CmsSection {
+  id        String         @id @default(uuid()) @db.Uuid
+  pageId    String         @map("page_id") @db.Uuid
+  type      CMSSectionType
+  title     String?        @db.VarChar(160)
+  subtitle  String?        @db.VarChar(255)
+  body      String?
+  imageUrl  String?        @map("image_url") @db.VarChar(500)
+  content   Json?
+  sortOrder Int            @default(0) @map("sort_order")
+  isVisible Boolean        @default(true) @map("is_visible")
+  createdBy String?        @map("created_by") @db.Uuid
+  updatedBy String?        @map("updated_by") @db.Uuid
+  createdAt DateTime       @default(now()) @map("created_at")
+  updatedAt DateTime       @updatedAt @map("updated_at")
+  page      CmsPage        @relation(fields: [pageId], references: [id], onDelete: Cascade)
+
+  @@index([pageId, sortOrder])
+  @@map("cms_sections")
+}
+
+model CmsBanner {
+  id        String    @id @default(uuid()) @db.Uuid
+  title     String    @db.VarChar(160)
+  message   String
+  imageUrl  String?   @map("image_url") @db.VarChar(500)
+  linkUrl   String?   @map("link_url") @db.VarChar(500)
+  startDate DateTime? @map("start_date")
+  endDate   DateTime? @map("end_date")
+  isActive  Boolean   @default(true) @map("is_active")
+  sortOrder Int       @default(0) @map("sort_order")
+  createdBy String?   @map("created_by") @db.Uuid
+  updatedBy String?   @map("updated_by") @db.Uuid
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+
+  @@index([isActive, startDate, endDate])
+  @@map("cms_banners")
+}
